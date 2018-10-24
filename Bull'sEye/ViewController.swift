@@ -10,32 +10,86 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var currentValue = 0
+    @IBOutlet weak var slider: UISlider!
+    var targetValue = 0
+    @IBOutlet weak var targetLable: UILabel!
+    var score = 0
+    @IBOutlet weak var scoreLabel: UILabel!
+    var round = 0
+    @IBOutlet weak var roundLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        currentValue = lroundf(slider.value)
+        startNewGame()
     }
+    
+   @IBAction func startNewGame() {
+        score = 0
+        round = 0
+        startNewRound()
+    }
+    
+    func updateLables() {
+        targetLable.text = String(targetValue)
+        scoreLabel.text = String(score)
+        roundLabel.text = String(round)
+    }
+    
+    func startNewRound() {
+        round += 1
+        targetValue = 1 + Int(arc4random_uniform(100))
+        currentValue = 50
+        slider.value = Float(currentValue)
+        updateLables()
+    }
+    
+    @IBAction func sliderMoved(_ slider: UISlider) {
+        print("The value of the slider is now: \(slider.value)")
+        currentValue = lroundf(slider.value)
+    }
+    
     
     @IBAction func showAlert() {
         
-        let alert = UIAlertController(title: "Hello World!", message: "This is my frist app!", preferredStyle: .alert)
+        let difference = abs(targetValue - currentValue)
+        var points = 100 - difference
         
-        let action = UIAlertAction(title: "Awesome", style: .default, handler: nil)
+        let title: String
+        if difference == 0 {
+            title = "Perfect!"
+            points += 100
+        } else if difference < 5 {
+            title = "You almost had it!"
+            if difference == 1 {
+             points += 50
+            }
+        } else if difference < 10 {
+            title = "Pretty good!"
+        } else {
+            title = "Not even close..."
+        }
+        
+        score += points
+        
+        let message = "You scored \(points) points"
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Awesome", style: .default, handler: {
+            action in
+            self.startNewRound()
+        })
         
         alert.addAction(action)
         
         present(alert,animated: true, completion: nil)
+        
+        
     }
     
-    @IBAction func KnockKnock() {
-        
-        let alert = UIAlertController(title: "knock knock!", message: "Who's There!", preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: "little old lady", style: .default, handler: nil)
-        
-        alert.addAction(action)
-        
-        present(alert,animated: true, completion: nil)
-    }
+    
     
 }
 
